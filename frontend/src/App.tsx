@@ -8,7 +8,7 @@ function App() {
     const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
-    fetch('http://localhost:8000/time').then(res => res.json()).then(data => {
+    fetch('https://pop-pup.vercel.app/time').then(res => res.json()).then(data => {
       setCurrentTime(data.time);
     });
   }, []);
