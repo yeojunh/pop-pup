@@ -1,13 +1,15 @@
-from flask import Flask
-# from event_bus import EventBus
-from flask_cors import CORS
+import os
 import time
+from flask import Flask
+from flask_cors import CORS
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})  # CORS configuration [allow frontend]
+load_dotenv()
 
-# event_bus = EventBus()
+CLIENT_API_ENDPOINT = os.environ.get('PROD_CLIENT_ENDPOINT') if os.environ.get('IS_PROD') == "True" else os.environ.get('LOCAL_CLIENT_ENDPOINT')
+CORS(app, resources={r"/*": {"origins": CLIENT_API_ENDPOINT}})  # CORS configuration [allow frontend]
 
 @app.route('/')
 def index(): 

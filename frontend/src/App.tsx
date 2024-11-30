@@ -4,11 +4,14 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
+  const SERVER_API_ENDPOINT = import.meta.env.PROD ? import.meta.env.VITE_PROD_SERVER_ENDPOINT : import.meta.env.VITE_LOCAL_SERVER_ENDPOINT;
+  console.log('SERVER_API_ENDPOINT:', SERVER_API_ENDPOINT);
+  
   const [count, setCount] = useState(0)
-    const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
-    fetch('https://pop-pup.vercel.app/time').then(res => res.json()).then(data => {
+    fetch(`${SERVER_API_ENDPOINT}/time`).then(res => res.json()).then(data => {
       setCurrentTime(data.time);
     });
   }, []);
