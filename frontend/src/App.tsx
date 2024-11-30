@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { Auth } from './components/auth';
 
 function App() {
   const SERVER_API_ENDPOINT = import.meta.env.PROD ? import.meta.env.VITE_PROD_SERVER_ENDPOINT : import.meta.env.VITE_LOCAL_SERVER_ENDPOINT;
-  console.log('SERVER_API_ENDPOINT:', SERVER_API_ENDPOINT);
   
   const [count, setCount] = useState(0)
   const [currentTime, setCurrentTime] = useState(0);
@@ -28,6 +28,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
+        <Auth />
         <p>The current time is {currentTime}.</p>
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
