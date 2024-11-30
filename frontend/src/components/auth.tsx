@@ -51,7 +51,9 @@ export const Auth = () => {
                     </div>
                 ) : (
                     <div>
+                        <button onClick={signInWithGoogle}>Sign in with Google </button>
                         {/* sign in with email and password
+                        <p>or</p> 
                         <input placeholder="Enter your name" onChange={(e) => setName(e.target.value)}/> 
                         <br/>
                         <input placeholder="Enter your email" onChange={(e) => setEmail(e.target.value)}/> 
@@ -62,8 +64,7 @@ export const Auth = () => {
                         <button onClick={login}>Log in</button>
                         <br/>
                         <button onClick={signIn}>Sign up</button>
-                        <p>or</p> */}
-                        <button onClick={signInWithGoogle}>Sign in with Google </button>
+                        */}
                     </div>
                 )
             } 
