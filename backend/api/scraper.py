@@ -5,12 +5,19 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, ElementNotInteractableException, ElementClickInterceptedException
 from bs4 import BeautifulSoup
 import requests
-from datetime import date, timedelta
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+import datetime
 import time
 import re
+import os
 
 class Scraper: 
     def __init__(self): 
+        cred = credentials.Certificate(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+        firebase_admin.initialize_app(cred)
+        self.db = firestore.Client()
         self.urls = {
             "main": "https://spca.bc.ca/",
             "dog": "https://adopt.spca.bc.ca/type/dog/",
@@ -54,6 +61,17 @@ class Scraper:
 
     def fetch_cats(self): 
         return self.fetch_animal(self.urls['cat'], 'cat')
+
+
+    def add_default_animal(self): 
+        animal_info = self.initialize_info()
+        animal_info['compatibility'] = self.initialize_compatibility()
+        self.add_animal_to_db(animal_info)
+
+
+    def retrieve_default_animal_from_db(self) -> dict:  
+        animal = self.retrieve_animal_from_db('0000')
+        return animal
 
 
     def fetch_other_animals(self): 
@@ -147,8 +165,16 @@ class Scraper:
 
 
     def add_animal_to_db(self, animal_info: dict): 
-        """Adds dog to database."""
+        """Adds an animal to database."""
+        doc_ref = self.db.collection('animals').document(animal_info['id'])
+        doc_ref.set(animal_info)
         pass
+
+
+    def retrieve_animal_from_db(self, id: str) -> dict: 
+        """Retrieves an animal from the database."""
+        animal = self.db.collection('animals').document(id).get().to_dict()
+        return animal
 
 
     def get_animal_images_from_html(self, images_html: str) -> list: 
@@ -207,7 +233,7 @@ class Scraper:
             if key is None or value is None:
                 continue
             info[key] = value
-        info['since'] = date.today() - timedelta(int(info['since']))
+        info['since'] = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(int(info['since']))
         info['breed'] = self.parse_breed(info['breed'])
         info['colour'] = self.parse_colour(info['colour'])
 
@@ -284,18 +310,18 @@ class Scraper:
         return {
             'name': '',
             'description': '',
-            'since': 0, 
+            'since': datetime.datetime.now(tz=datetime.timezone.utc),
             'age': 0,
             'pet_type': '',
-            'breed': '',
-            'colour': '',
-            'weight': 0,
+            'breed': [],
+            'colour': [],
+            'weight': '',
             'sex': '',
             'location': '',
-            'id': 0,
+            'id': '0000',
             'compatibility': [],
             'url': '',
-            'date_created': date.today(),
+            'date_created': firestore.SERVER_TIMESTAMP,
         }
 
 
