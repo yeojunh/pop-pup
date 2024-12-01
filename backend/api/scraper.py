@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import requests
 from datetime import date, timedelta
 import time
+import re
 
 class Scraper: 
     def __init__(self): 
@@ -29,15 +30,58 @@ class Scraper:
 
 
     # doesn't work on vercel, might have to run locally only
+    def fetch_all_animals(self): 
+        all_animals = {}
+        all_animals['dog'] = self.fetch_animal(self.urls['dog'], 'dog')
+        all_animals['cat'] = self.fetch_animal(self.urls['cat'], 'cat')
+        all_animals['amphibian_exotic'] = self.fetch_animal(self.urls['amphibian_exotic'], 'exotic amphibian')
+        all_animals['bird_exotic'] = self.fetch_animal(self.urls['bird_exotic'], 'exotic bird')
+        all_animals['farm_animal'] = self.fetch_animal(self.urls['farm_animal'], 'farm animal')
+        all_animals['farm_animal_exotic'] = self.fetch_animal(self.urls['farm_animal_exotic'], 'exotic farm animal')
+        all_animals['fish'] = self.fetch_animal(self.urls['fish'], 'fish')
+        all_animals['horse'] = self.fetch_animal(self.urls['horse'], 'horse')
+        all_animals['invertebrate'] = self.fetch_animal(self.urls['invertebrate'], 'invertebrate')
+        all_animals['rabbit'] = self.fetch_animal(self.urls['rabbit'], 'rabbit')
+        all_animals['reptile_exotic'] = self.fetch_animal(self.urls['reptile_exotic'], 'exotic reptile')
+        all_animals['small_animal'] = self.fetch_animal(self.urls['small_animal'], 'small animal')
+        all_animals['small_animal_exotic'] = self.fetch_animal(self.urls['small_animal_exotic'], 'small exotic animal')
+        return all_animals
+
+
     def fetch_dogs(self): 
+        return self.fetch_animal(self.urls['dog'], 'dog')
+
+
+    def fetch_cats(self): 
+        return self.fetch_animal(self.urls['cat'], 'cat')
+
+
+    def fetch_other_animals(self): 
+        animals = []
+        animals.extend(self.fetch_animal(self.urls['amphibian_exotic'], 'exotic amphibian'))
+        animals.extend(self.fetch_animal(self.urls['bird_exotic'], 'exotic bird'))
+        animals.extend(self.fetch_animal(self.urls['farm_animal'], 'farm animal'))
+        animals.extend(self.fetch_animal(self.urls['farm_animal_exotic'], 'exotic farm animal'))
+        animals.extend(self.fetch_animal(self.urls['fish'], 'fish'))
+        animals.extend(self.fetch_animal(self.urls['horse'], 'horse'))
+        animals.extend(self.fetch_animal(self.urls['invertebrate'], 'invertebrate'))
+        animals.extend(self.fetch_animal(self.urls['rabbit'], 'rabbit'))
+        animals.extend(self.fetch_animal(self.urls['reptile_exotic'], 'exotic reptile'))
+        animals.extend(self.fetch_animal(self.urls['small_animal'], 'small animal'))
+        animals.extend(self.fetch_animal(self.urls['small_animal_exotic'], 'small exotic animal'))
+        return animals
+
+
+    def fetch_animal(self, url: str, animal: str) -> list: 
+        """Given the URL of the animal listings page, returns a list of animal listings."""
         options = webdriver.ChromeOptions()
         options.add_argument("--headless=new")
         driver = webdriver.Chrome(options=options)
-
         html = ""
+
         try:
             # load the entire page 
-            driver.get('https://adopt.spca.bc.ca/type/dog/')
+            driver.get(url)
             wait = WebDriverWait(driver, 5)
             while (True): 
                 wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'ajax-load-more-query-button')))
@@ -46,43 +90,70 @@ class Scraper:
                 html = driver.page_source
                 input_element.click()
         except (TimeoutException, ElementNotInteractableException) as e: 
-            print("Loaded all dogs.")
+            print(f"Loaded all {animal}s.")
         except Exception as e: 
-            print(f"Error loading dogs: {e}")
+            print(f"Error loading {animal}s: {e}")
         finally: 
             driver.quit()
         
-        # go through each dog 
-        dogs_list = self.get_dogs_from_html(html)
-
-        # add to database 
-
-        return dogs_list 
+        animals_list = self.get_animals_from_html(html)
+        return animals_list 
 
 
-    def get_dogs_from_html(self, html: str) -> list: 
-        """Given the string of dog listings page, returns a list of dog listings.""" 
-        dogs = []
+    def get_animals_from_html(self, html: str) -> list: 
+        """Given the string of dog listings page, returns a list of animal listings.""" 
+        animals = []
         soup = BeautifulSoup(html, 'html.parser')
         cards_html = soup.find_all(class_='ybd-sb-pet-card-container')
         for card_html in cards_html: 
-            dog_url = card_html.find('a', href=True)['href']
-            dog_html = requests.get(dog_url).text
-            dog_info = self.get_dog_info_from_html(dog_html)
-            dog_info['url'] = dog_url
-            dogs.append(dog_info)
-        return dogs
+            animal_url = card_html.find('a', href=True)['href']
+            animal_html = requests.get(animal_url).text
+            animal_info = self.get_animal_info_from_html(animal_html)
+            animal_info['url'] = animal_url
+            animals.append(animal_info)
+        return animals
 
 
-    def get_dog_info_from_html(self, html: str) -> dict: 
-        """Given the string of a dog's page, returns a dictionary of dog info and adds dog to database."""
+    def get_animal_info_from_html(self, html: str) -> dict: 
+        """Given the string of an animal's page, returns a dictionary of animal info and adds the animal to database."""
         soup = BeautifulSoup(html, 'html.parser')
         info = self.initialize_info()
-        images = []
         compatibility = self.initialize_compatibility()
 
         # images 
         images_html = soup.find_all(class_='ybd-item-container')
+        info['images'] = self.get_animal_images_from_html(images_html)
+
+        # name
+        name_text = soup.find(class_='pet-name').text        
+        info['name'] = self.parse_animal_name(name_text, compatibility)
+
+        # description
+        description_htmls = soup.find(class_='ybd-sb-content').find_all('p')
+        for description_html in description_htmls: 
+            info['description'] += description_html.text
+
+        # about me
+        details_htmls = soup.find_all(class_='ybd-sb-pet-details-block')
+        self.parse_animal_details(details_htmls, info)
+
+        # compatibility 
+        compatibility_htmls = details_htmls[1].find('ul').find_all('li')
+        self.parse_animal_compatibility(compatibility_htmls, compatibility)
+        info['compatibility'] = compatibility
+
+        self.add_animal_to_db(info)
+        return info
+
+
+    def add_animal_to_db(self, animal_info: dict): 
+        """Adds dog to database."""
+        pass
+
+
+    def get_animal_images_from_html(self, images_html: str) -> list: 
+        """ Given the string of an animal's page, returns a list of image URLs."""
+        images = []
         for image_html in images_html: 
             image_html = image_html.find('a', href=True)
             if image_html: 
@@ -98,16 +169,34 @@ class Scraper:
                     compatibility['in_foster'] = 'Yes'
                 elif 'long-term-flag' in foster_html:
                     compatibility['longterm_resident'] = 'Yes'
-        info['images'] = images
+        return images
 
-        # name and description
-        info['name'] = soup.find(class_='pet-name').text
-        description_htmls = soup.find(class_='ybd-sb-content').find_all('p')
-        for description_html in description_htmls: 
-            info['description'] += description_html.text
 
-        # about me
-        details_htmls = soup.find_all(class_='ybd-sb-pet-details-block')
+    def parse_animal_name(self, name: str, compatibility: dict) -> str: 
+        """Given the name of an animal, returns the name of the animal. If the name includes compatibility indicators, it will also update the compatibility dictionary."""
+        # 'adoption pending' or 'pending adoption' in name
+        parsed = name
+        if parsed.lower().find('adoption') != -1: 
+            name_raw = re.split("adoption", parsed, flags=re.IGNORECASE)[0].strip()
+            parsed = re.split("pending", name_raw, flags=re.IGNORECASE)[0].strip()[:-1] if name_raw.find('pending') != -1 else name_raw[:-1].strip()
+            compatibility['adoption_pending'] = 'Yes'
+
+        # 'in foster' in name
+        if parsed.lower().find('in foster') != -1:
+            name_raw = re.split("in foster", parsed, flags=re.IGNORECASE)[0].strip()
+            parsed = name_raw[:-1].strip() # remove last char which is a special character
+            compatibility['in_foster'] = 'Yes'
+
+        # 'bonded to' in name
+        if parsed.lower().find('bonded') != -1:
+            name_raw = re.split("bonded", parsed, flags=re.IGNORECASE)[0].strip()
+            parsed = name_raw[:-1].strip()
+            compatibility['bonded'] = 'Yes'
+        return parsed
+
+
+    def parse_animal_details(self, details_htmls: list, info: dict): 
+        """Given the details of an animal, updates the animal info dictionary."""
         about_htmls = details_htmls[0].find('ul').find_all('li')
         for about_html in about_htmls: 
             texts = about_html.find_all(text=True)
@@ -122,8 +211,9 @@ class Scraper:
         info['breed'] = self.parse_breed(info['breed'])
         info['colour'] = self.parse_colour(info['colour'])
 
-        # compatibility 
-        compatibility_htmls = details_htmls[1].find('ul').find_all('li')
+
+    def parse_animal_compatibility(self, compatibility_htmls: list, compatibility: dict):
+        """Given the compatibility of an animal, updates the compatibility dictionary."""
         for compatibility_html in compatibility_htmls: 
             icon_html = compatibility_html.find('img')
             icon_text = icon_html['alt']
@@ -137,10 +227,6 @@ class Scraper:
             compatibility['ok_with_cats'] = 'No'
             compatibility['ok_with_dogs'] = 'No'
             del compatibility['no_other_animals']
-        info['compatibility'] = compatibility
-
-        self.add_dog_to_db(info)
-        return info
 
 
     def get_compatibility_key(self, text: str) -> str:
@@ -166,14 +252,9 @@ class Scraper:
 
 
     def get_compatibility_value(self, text: str) -> str: 
-        warning = "https://adopt.spca.bc.ca/wp-content/themes/adopt-theme/img/compat-warning.png"
-        checkmark = "https://adopt.spca.bc.ca/wp-content/themes/adopt-theme/img/compat-checkmark.png"
-        indoor_outdoor = "https://adopt.spca.bc.ca/wp-content/themes/adopt-theme/img/compat-indoor_outdoor.png"
-        staff_pick = "https://adopt.spca.bc.ca/wp-content/themes/adopt-theme/img/compat-staff_pick.png"
-
-        if text == warning: 
+        if text.find('warning') != -1: 
             return 'No'
-        elif text == checkmark or text == indoor_outdoor or text == staff_pick: 
+        elif text.find('checkmark') != -1 or text.find('indoor-outdoor') != 1 or text.find('staff_pick') != -1: 
             return 'Yes'
 
 
@@ -220,9 +301,11 @@ class Scraper:
 
     def initialize_compatibility(self): 
         return {
+            'bonded': 'No',
+            'in_foster': 'No', 
+            'adoption_pending': 'No',
             'featured_pet': 'No',
             'staff_pick': 'No',
-            'longterm_resident': 'No',
             'special_needs': 'No',
             'house_trained': 'Unknown',
             'indoor_only': 'Unknown',
@@ -230,8 +313,8 @@ class Scraper:
             'lived_with_kids': 'Unknown',
             'ok_with_cats': 'Unknown',
             'ok_with_dogs': 'Unknown',
-            'special_fee': 'Unknown',
             'ok_with_livestock': 'Unknown',
+            'longterm_resident': 'No',
         }
 
     
@@ -242,7 +325,3 @@ class Scraper:
     def parse_colour(self, colour: str) -> list: 
         colours = colour.split(' / ')
         return colours
-
-    def add_dog_to_db(self, dog_info: dict): 
-        """Adds dog to database."""
-        pass

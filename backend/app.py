@@ -21,10 +21,25 @@ def index():
 def get_current_time(): 
     return {'time': time.time()}
 
+@app.route('/api/scraper/all')
+def get_all(): 
+    animals = scraper.fetch_all_animals()
+    return jsonify(animals)
+
 @app.route('/api/scraper/dogs')
 def get_dogs(): 
     dogs = scraper.fetch_dogs()
     return jsonify(dogs)
+
+@app.route('/api/scraper/cats')
+def get_cats(): 
+    cats = scraper.fetch_cats()
+    return jsonify(cats)
+
+@app.route('/api/scraper/other')
+def get_other_animals(): 
+    other_animals = scraper.fetch_other_animals()
+    return jsonify(other_animals)
 
 if __name__ == '__main__': 
     print("Server is starting...")
