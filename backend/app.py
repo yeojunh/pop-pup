@@ -1,10 +1,10 @@
 import os
 import time
 from flask import Flask
+from flask import jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-from scraper import Scraper
-from flask import jsonify
+from api.scraper import Scraper
 
 app = Flask(__name__)
 scraper = Scraper()

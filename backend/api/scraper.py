@@ -46,7 +46,7 @@ class Scraper:
                 html = driver.page_source
                 input_element.click()
         except (TimeoutException, ElementNotInteractableException) as e: 
-            print("No more dogs to load.")
+            print("Loaded all dogs.")
         except Exception as e: 
             print(f"Error loading dogs: {e}")
         finally: 
@@ -213,24 +213,24 @@ class Scraper:
             'location': '',
             'id': 0,
             'compatibility': [],
-            'date_created': date.today(),
             'url': '',
+            'date_created': date.today(),
         }
 
 
     def initialize_compatibility(self): 
         return {
-            'featured_pet': 'Unknown',
+            'featured_pet': 'No',
+            'staff_pick': 'No',
+            'longterm_resident': 'No',
+            'special_needs': 'No',
             'house_trained': 'Unknown',
             'indoor_only': 'Unknown',
             'indoor_outdoor': 'Unknown',
             'lived_with_kids': 'Unknown',
-            'longterm_resident': 'Unknown',
             'ok_with_cats': 'Unknown',
             'ok_with_dogs': 'Unknown',
             'special_fee': 'Unknown',
-            'special_needs': 'Unknown',
-            'staff_pick': 'Unknown',
             'ok_with_livestock': 'Unknown',
         }
 
