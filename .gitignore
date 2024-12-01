@@ -4,7 +4,7 @@ venv/
 .env
 __pycache__/
 playground*
-firebase_key.json
+google_application_credentials.json
 
 # frontend 
 ## Logs

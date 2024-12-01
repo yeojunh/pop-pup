@@ -11,12 +11,5 @@
             "src": "/(.*)",
             "dest": "app.py"
         }
-    ], 
-    "functions": {
-        "backend/api/scraper.py": {
-            "runtime": "@vercel/python",
-            "memory": 1024, 
-            "maxDuration": 60
-        }
-    }
+    ]
 }

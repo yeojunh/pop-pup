@@ -15,9 +15,13 @@ import os
 
 class Scraper: 
     def __init__(self): 
-        cred = credentials.Certificate(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+        temp_file = '/tmp/google_application_credentials.json'
+        f = open(temp_file, "w")
+        f.write(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS_RAW'))
+        f.close()
+        cred = credentials.Certificate(temp_file)
         firebase_admin.initialize_app(cred)
-        self.db = firestore.Client()
+        self.db = firestore.client()
         self.urls = {
             "main": "https://spca.bc.ca/",
             "dog": "https://adopt.spca.bc.ca/type/dog/",
