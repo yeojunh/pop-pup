@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, ElementNotInteractableException, ElementClickInterceptedException
 from bs4 import BeautifulSoup
 import requests
+from datetime import date, timedelta
 import time
 
 class Scraper: 
@@ -27,6 +28,7 @@ class Scraper:
         }
 
 
+    # doesn't work on vercel, might have to run locally only
     def fetch_dogs(self): 
         options = webdriver.ChromeOptions()
         options.add_argument("--headless=new")
@@ -67,6 +69,7 @@ class Scraper:
             dog_url = card_html.find('a', href=True)['href']
             dog_html = requests.get(dog_url).text
             dog_info = self.get_dog_info_from_html(dog_html)
+            dog_info['url'] = dog_url
             dogs.append(dog_info)
         return dogs
 
@@ -74,7 +77,9 @@ class Scraper:
     def get_dog_info_from_html(self, html: str) -> dict: 
         """Given the string of a dog's page, returns a dictionary of dog info and adds dog to database."""
         soup = BeautifulSoup(html, 'html.parser')
+        info = self.initialize_info()
         images = []
+        compatibility = self.initialize_compatibility()
 
         # images 
         images_html = soup.find_all(class_='ybd-item-container')
@@ -84,13 +89,159 @@ class Scraper:
                 image_url = image_html['href']
                 images.append(image_url)
 
-        # details 
-        info = {}
+                # check if in foster or long term resident - they are not in the compatibility section
+                flag_html = image_html.find(class_='infoster')
+                if flag_html is None: 
+                    continue
+                foster_html = flag_html['src']
+                if 'in-foster-flag' in foster_html:
+                    compatibility['in_foster'] = 'Yes'
+                elif 'long-term-flag' in foster_html:
+                    compatibility['longterm_resident'] = 'Yes'
+        info['images'] = images
+
+        # name and description
         info['name'] = soup.find(class_='pet-name').text
+        description_htmls = soup.find(class_='ybd-sb-content').find_all('p')
+        for description_html in description_htmls: 
+            info['description'] += description_html.text
+
+        # about me
+        details_htmls = soup.find_all(class_='ybd-sb-pet-details-block')
+        about_htmls = details_htmls[0].find('ul').find_all('li')
+        for about_html in about_htmls: 
+            texts = about_html.find_all(text=True)
+            if len(texts) < 2: 
+                continue
+            key = self.get_info_key(texts[0].strip())
+            value = texts[1].strip()
+            if key is None or value is None:
+                continue
+            info[key] = value
+        info['since'] = date.today() - timedelta(int(info['since']))
+        info['breed'] = self.parse_breed(info['breed'])
+        info['colour'] = self.parse_colour(info['colour'])
+
+        # compatibility 
+        compatibility_htmls = details_htmls[1].find('ul').find_all('li')
+        for compatibility_html in compatibility_htmls: 
+            icon_html = compatibility_html.find('img')
+            icon_text = icon_html['alt']
+            icon_url = icon_html['src']
+            key = self.get_compatibility_key(icon_text.strip())
+            value = self.get_compatibility_value(icon_url)
+            if key is None or value is None: 
+                continue
+            compatibility[key] = value
+        if 'no_other_animals' in compatibility: 
+            compatibility['ok_with_cats'] = 'No'
+            compatibility['ok_with_dogs'] = 'No'
+            del compatibility['no_other_animals']
+        info['compatibility'] = compatibility
 
         self.add_dog_to_db(info)
         return info
 
+
+    def get_compatibility_key(self, text: str) -> str:
+        labels = {
+            'Featured Animal': 'featured_pet',
+            'Staff Pick': 'staff_pick',
+            'House Trained': 'house_trained', 
+            'Indoor Only': 'indoor_only',
+            'Indoor / Outdoor': 'indoor_outdoor',
+            'OK With Dogs': 'ok_with_dogs',
+            'No Dogs': 'ok_with_dogs',
+            'OK With Cats': 'ok_with_cats',
+            'No Cats': 'ok_with_cats',
+            'Lived With Kids': 'lived_with_kids',
+            'No Small Children': 'lived_with_kids',
+            'No Other Animals': 'no_other_animals',
+            'Special Needs': 'special_needs',
+            'Not Compatible With Livestock': 'ok_with_livestock',
+        }
+
+        if text in labels:
+            return labels[text]
+
+
+    def get_compatibility_value(self, text: str) -> str: 
+        warning = "https://adopt.spca.bc.ca/wp-content/themes/adopt-theme/img/compat-warning.png"
+        checkmark = "https://adopt.spca.bc.ca/wp-content/themes/adopt-theme/img/compat-checkmark.png"
+        indoor_outdoor = "https://adopt.spca.bc.ca/wp-content/themes/adopt-theme/img/compat-indoor_outdoor.png"
+        staff_pick = "https://adopt.spca.bc.ca/wp-content/themes/adopt-theme/img/compat-staff_pick.png"
+
+        if text == warning: 
+            return 'No'
+        elif text == checkmark or text == indoor_outdoor or text == staff_pick: 
+            return 'Yes'
+
+
+    def get_info_key(self, text: str) -> str: 
+        """
+        Given a text, returns the info key of the detail.
+        I am not sure if the detail is always in the same order. 
+        This function is to ensure that the key is order-agnostic.
+        """
+        labels = {
+            'Days in care:': 'since',
+            'Approximate age:': 'age',
+            'Pet Type:': 'pet_type',
+            'Breed:': 'breed',
+            'Colour:': 'colour',
+            'Weight:': 'weight',
+            'Sex:': 'sex',
+            'Location:': 'location',
+            'Animal ID:': 'id',
+        }
+        
+        if text in labels: 
+            return labels[text]
+
+
+    def initialize_info(self): 
+        return {
+            'name': '',
+            'description': '',
+            'since': 0, 
+            'age': 0,
+            'pet_type': '',
+            'breed': '',
+            'colour': '',
+            'weight': 0,
+            'sex': '',
+            'location': '',
+            'id': 0,
+            'compatibility': [],
+            'date_created': date.today(),
+            'url': '',
+        }
+
+
+    def initialize_compatibility(self): 
+        return {
+            'featured_pet': 'Unknown',
+            'house_trained': 'Unknown',
+            'indoor_only': 'Unknown',
+            'indoor_outdoor': 'Unknown',
+            'lived_with_kids': 'Unknown',
+            'longterm_resident': 'Unknown',
+            'ok_with_cats': 'Unknown',
+            'ok_with_dogs': 'Unknown',
+            'special_fee': 'Unknown',
+            'special_needs': 'Unknown',
+            'staff_pick': 'Unknown',
+            'ok_with_livestock': 'Unknown',
+        }
+
+    
+    def parse_breed(self, breed: str) -> list: 
+        breeds = breed.split(' / ')
+        return breeds 
+
+    def parse_colour(self, colour: str) -> list: 
+        colours = colour.split(' / ')
+        return colours
 
     def add_dog_to_db(self, dog_info: dict): 
         """Adds dog to database."""
