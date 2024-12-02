@@ -1,68 +1,61 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
 import { Auth } from './components/auth';
-import { db } from './firebase-config';
-import { getDocs, collection } from 'firebase/firestore';
 
 function App() {
   const SERVER_API_ENDPOINT = import.meta.env.PROD ? import.meta.env.VITE_PROD_SERVER_ENDPOINT : import.meta.env.VITE_LOCAL_SERVER_ENDPOINT;
-  
-  const [count, setCount] = useState(0)
+
+  const [count, setCount] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  
+  const [animal, setAnimal] = useState<Animal | null>(null);
+
   interface Animal {
     id: string;
     name: string;
     description: string;
     species: string;
-    age: number; 
+    age: number;
     weight: number;
     colour: string[];
     breed: string[];
-    sex: string; 
-    location: Geolocation;
+    sex: string;
+    location: string;
     since: Date;
-    image_url: string[];
+    images: string[];
     compatibility: Map<string, string>;
   }
 
-  const [animalList, setAnimalList] = useState<Animal[]>([]);
-
-  const animalsCollectionRef = collection(db, 'animals');
-
-  // show as soon as the page loads
   useEffect(() => {
-    const getAnimalList = async () => {
+    const fetchAnimal = async () => {
       try {
-        const data = await getDocs(animalsCollectionRef);
-        const filteredData = data.docs.map((doc) => {
-          const animalData = doc.data();
-          return {
-            id: animalData.id,
-            name: animalData.name,
-            description: animalData.description,
-            species: animalData.species,
-            age: animalData.age,
-            weight: animalData.weight,
-            colour: animalData.colour,
-            breed: animalData.breed,
-            sex: animalData.sex,
-            location: animalData.location,
-            since: animalData.since.toDate(),
-            image_url: animalData.image_url,
-            compatibility: animalData.compatibility,
-          } as Animal;
-        });
-        setAnimalList(filteredData);
+        const response = await fetch(`${SERVER_API_ENDPOINT}/api/scraper/get_test_animal`);
+        const data = await response.json();
+        const fetchedAnimal: Animal = {
+          id: data.id,
+          name: data.name,
+          description: data.description,
+          species: data.species,
+          age: data.age,
+          weight: data.weight,
+          colour: data.colour,
+          breed: data.breed,
+          sex: data.sex,
+          location: data.location,
+          since: new Date(data.since),
+          images: data.image_url,
+          compatibility: new Map(Object.entries(data.compatibility)),
+        };
+        setAnimal(fetchedAnimal);
       } catch (err) {
         console.error(err);
       }
-    }
+    };
 
-    getAnimalList();
-  }, []);
+    fetchAnimal();
+  }, [SERVER_API_ENDPOINT]);
+
 
   useEffect(() => {
     fetch(`${SERVER_API_ENDPOINT}/time`).then(res => res.json()).then(data => {
@@ -83,13 +76,13 @@ function App() {
       <h1>Vite + React</h1>
       <div className="card">
         <Auth />
-        {animalList.map((animal) => (
-          <div key={animal.id}>
-            <h2>Featured Animal</h2>
-            <p>Name: {animal.name}</p>
-            <p>Description: {animal.description}</p>
+        {animal && (
+          <div>
+            <h2>{animal.name}</h2>
+            <p>{animal.description}</p>
+            {/* Add more fields as needed */}
           </div>
-        ))}
+        )}
         <p>The current time is {currentTime}.</p>
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}

@@ -50,6 +50,16 @@ def post_default_animal():
 def get_default_animal(): 
     post = scraper.retrieve_default_animal_from_db()
     return jsonify(post)
+
+@app.route('/api/scraper/add_test_animal')
+def add_test_animal(): 
+    post = scraper.add_test_animal()
+    return jsonify(post)
+
+@app.route('/api/scraper/get_test_animal')
+def get_test_animal(): 
+    post = scraper.get_test_animal()
+    return jsonify(post)
     
 if __name__ == '__main__': 
     print("Server is starting...")

@@ -67,17 +67,6 @@ class Scraper:
         return self.fetch_animal(self.urls['cat'], 'cat')
 
 
-    def add_default_animal(self): 
-        animal_info = self.initialize_info()
-        animal_info['compatibility'] = self.initialize_compatibility()
-        self.add_animal_to_db(animal_info)
-
-
-    def retrieve_default_animal_from_db(self) -> dict:  
-        animal = self.retrieve_animal_from_db('0000')
-        return animal
-
-
     def fetch_other_animals(self): 
         animals = []
         animals.extend(self.fetch_animal(self.urls['amphibian_exotic'], 'exotic amphibian'))
@@ -93,6 +82,53 @@ class Scraper:
         animals.extend(self.fetch_animal(self.urls['small_animal_exotic'], 'small exotic animal'))
         return animals
 
+
+    def add_default_animal(self): 
+        animal_info = self.initialize_info()
+        animal_info['compatibility'] = self.initialize_compatibility()
+        self.add_animal_to_db(animal_info)
+
+
+    def retrieve_default_animal_from_db(self) -> dict:  
+        animal = self.retrieve_animal_from_db('0000')
+        return animal
+
+
+    def add_test_animal(self):
+        animal = self.initialize_info()
+        animal['compatibility'] = self.initialize_compatibility()
+        animal['name'] = 'Ginger'
+        animal['description'] = 'Meet Ginger! He\'s a stinky dog who loves to play fetch.'
+        animal['since'] = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(10)
+        animal['age'] = 5
+        animal['pet_type'] = 'Dog'
+        animal['breed'] = ['Labrador Retriever', 'Beagle']
+        animal['colour'] = ['Yellow', 'White']
+        animal['weight'] = '50 lbs'
+        animal['sex'] = 'Male'
+        animal['location'] = 'Vancouver'
+        animal['id'] = '0001'
+        animal['url'] = ''
+        animal['images'] = []
+        animal['compatibility']['ok_with_dogs'] = 'Yes'
+        animal['compatibility']['ok_with_cats'] = 'No'
+        animal['compatibility']['ok_with_livestock'] = 'Unknown'
+        animal['compatibility']['house_trained'] = 'Yes'
+        animal['compatibility']['indoor_only'] = 'No'
+        animal['compatibility']['indoor_outdoor'] = 'Yes'
+        animal['compatibility']['lived_with_kids'] = 'No'
+        animal['compatibility']['special_needs'] = 'No'
+        animal['compatibility']['featured_pet'] = 'Yes'
+        animal['compatibility']['staff_pick'] = 'No'
+        animal['compatibility']['bonded'] = 'Yes'
+        animal['compatibility']['in_foster'] = 'Yes'
+        animal['compatibility']['adoption_pending'] = 'Yes'
+        animal['compatibility']['longterm_resident'] = 'No'
+        self.add_animal_to_db(animal)
+
+    def get_test_animal(self): 
+        animal = self.retrieve_animal_from_db('0001')
+        return animal
 
     def fetch_animal(self, url: str, animal: str) -> list: 
         """Given the URL of the animal listings page, returns a list of animal listings."""
@@ -131,6 +167,7 @@ class Scraper:
             animal_url = card_html.find('a', href=True)['href']
             animal_html = requests.get(animal_url).text
             animal_info = self.get_animal_info_from_html(animal_html)
+            print(animal_url)
             animal_info['url'] = animal_url
             animals.append(animal_info)
         return animals
@@ -325,6 +362,7 @@ class Scraper:
             'id': '0000',
             'compatibility': [],
             'url': '',
+            'images': [],
             'date_created': firestore.SERVER_TIMESTAMP,
         }
 
