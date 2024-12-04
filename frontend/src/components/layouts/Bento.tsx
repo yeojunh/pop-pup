@@ -4,7 +4,7 @@ import { Auth } from '../../features/auth';
 
 export const Bento = ({recommendations}: {recommendations: string}) => {
   return (
-    <div className='min-h-screen min-w-full px-4 py-12 text-zinc-100'>
+    <div className='min-h-screen min-w-full px-4 py-12 text-garden-main'>
         <motion.div 
             initial="initial"
             animate="animate"
@@ -14,11 +14,11 @@ export const Bento = ({recommendations}: {recommendations: string}) => {
             <RecommendationsBlock recomendations={recommendations} />
             <DogsBlock />
             <CatsBlock />
+            <AccountBlock />
             <FavouritesBlock />
             <ImageBlock />
-            <ContactBlock />
             <OthersBlock />
-            <AccountBlock />
+            <ContactBlock />
         </motion.div>
     </div>
   );
@@ -45,7 +45,7 @@ const Block = ({className, ...rest}: Props) => {
                 stiffness: 400,
                 damping: 50,
             }}
-            className={twMerge('col-span-4 rounded-lg p-6 bg-campfire-emerald-default bg-gradient-to-tr from-campfire-emerald-default to-campfire-lime-default', className)}
+            className={twMerge('col-span-4 rounded-lg p-6 bg-garden-lightshade drop-shadow-md text-garden-darkshade text-center', className)}
             {...rest}
         />
     )
@@ -56,12 +56,12 @@ const RecommendationsBlock = ({recomendations}: {recomendations: string}) => {
         <>
             <Block className='col-span-6 row-span-2 md:col-span-7'>
                 <h1 className='text-2xl font-medium mb-4'>
-                    Recommendations
+                    Picked for you
                 </h1>
-                <div className='flex flex-row mx-8 gap-4 '>
+                <div className='flex flex-row mx-8 gap-4 justify-center'>
                     <InnerBlock img="https://miro.medium.com/v2/resize:fit:1400/1*rIkmavUeqyRySwlQdA9kKg.jpeg" text={recomendations} />
                     <InnerBlock img="https://pbs.twimg.com/media/GJ2vmapXsAEFXdV.jpg" text="Toby" />
-                    <InnerBlock img="https://pbs.twimg.com/media/GJ2vmapXsAEFXdV.jpg" text="See more" />
+                    <InnerBlock img="https://pbs.twimg.com/media/GJ2vmapXsAEFXdV.jpg" text="See more ->" />
                 </div>
             </Block>
         </>
@@ -70,8 +70,8 @@ const RecommendationsBlock = ({recomendations}: {recomendations: string}) => {
 
 const InnerBlock = ({img, text}: {img: string, text?: string}) => {
     return (
-        <Block className='bg-gradient-to-tr from-campfire-lime-dark to-campfire-lime-light'>            
-            <img className='w-20' src={img} />
+        <Block className='bg-garden-evendarkershade drop-shadow-md shadow-garden-evendarkershade text-garden-lightaccent font-bold'>            
+            <img className='w-40' src={img} />
             <p>{text}</p>
         </Block>
     )
@@ -105,7 +105,7 @@ const OthersBlock = () => {
             <h1 className='text-2xl font-medium mb-4'>
                 See more animals
             </h1>
-            <div className='flex flex-row gap-4'> 
+            <div className='flex flex-row gap-4 justify-center'> 
                 <InnerBlock img="https://ih1.redbubble.net/image.4085943093.7745/flat,750x,075,f-pad,750x1000,f8f8f8.jpg" text='rabbits, birds & small animals' />
                 <InnerBlock img="https://external-preview.redd.it/eTZ1DzYyLfPJFvko0tKd47Q6EedCQz7UFnROPDk9KpI.jpg?width=640&crop=smart&auto=webp&s=f56de1ffd5e5451ee64a0c1258e4d5e6f22e86fe" text='farm & stable animals' />
                 <InnerBlock img="https://i.imgflip.com/3mha0a.jpg?a481416" text='reptiles, fish & invertebrates'/>
@@ -114,11 +114,11 @@ const OthersBlock = () => {
     )
 }
 
-const FavouritesBlock = () => {
+const ContactBlock = () => {
     return (
         <Block className='col-span-2'>
             <p className='text-2xl font-sm mb-4'>
-                Favourites
+                Get in touch
             </p>
         </Block>
     )
@@ -145,11 +145,11 @@ const ImageBlock = () => {
     )
 }
 
-const ContactBlock = () => {
+const FavouritesBlock = () => {
     return (
         <Block className='col-span-2 row-span-2'>
             <p className='text-xl font-medium mb-4 hover:underline'>
-                Get in touch
+                Favourites
             </p>
         </Block>
     )

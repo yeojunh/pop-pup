@@ -36,47 +36,18 @@ export const Auth = () => {
         }
     }
 
-    // const signIn = async () => {
-    //     try {
-    //         await createUserWithEmailAndPassword(auth, email, password);
-    //     } catch (err) {
-    //         console.error(err);
-    //     }
-    // }
-    
-    // const login = async () => {
-    //     try {
-    //         await signInWithEmailAndPassword(auth, email, password);
-    //     } catch (err) {
-    //         console.error(err);
-    //     }
-    // }
-
     return (
-        <div>
+        <>
             {isLoggedIn ? (
-                <div>
-                    <h3>Welcome, {auth?.currentUser?.displayName?.split(' ')[0]}!</h3>
-                    <button onClick={logout}>Logout</button>
+                <div className='text-garden-darkshade font-thin'>
+                    <h3 className='p-2'>Welcome, {auth?.currentUser?.displayName?.split(' ')[0]}!</h3>
+                    <button className='bg-garden-darkshade text-garden-lightshade px-5 py-1 rounded-2xl' onClick={logout}>Logout</button>
                 </div>
             ) : (
-                <div>
+                <div className='text-garden-darkshade font-thin'>
                     <button onClick={signInWithGoogle}>Sign in with Google </button>
-                    {/* sign in with email and password
-                    <p>or</p> 
-                    <input placeholder="Enter your name" onChange={(e) => setName(e.target.value)}/> 
-                    <br/>
-                    <input placeholder="Enter your email" onChange={(e) => setEmail(e.target.value)}/> 
-                    <br/>
-                    <input placeholder="Enter your password" type='password' onChange={(e) => setPassword(e.target.value)}/>
-                    <br/>
-                    <br/>
-                    <button onClick={login}>Log in</button>
-                    <br/>
-                    <button onClick={signIn}>Sign up</button>
-                    */}
                 </div>
             )} 
-        </div>
+        </>
     );
 };
