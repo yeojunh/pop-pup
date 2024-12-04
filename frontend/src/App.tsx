@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import './tailwind.css';
-import { Auth } from './components/auth';
 import { Bento } from './components/Bento';
-import NoiseFilter from './components/NoiseFilter';
 
 function App() {
   const SERVER_API_ENDPOINT = import.meta.env.PROD ? import.meta.env.VITE_PROD_SERVER_ENDPOINT : import.meta.env.VITE_LOCAL_SERVER_ENDPOINT;
 
-  const [count, setCount] = useState(0);
-  const [currentTime, setCurrentTime] = useState("");
+  // const [count, setCount] = useState(0);
+  // const [currentTime, setCurrentTime] = useState("");
   const [animal, setAnimal] = useState<Animal>(
     {
       id: "",
@@ -73,11 +71,11 @@ function App() {
   }, [SERVER_API_ENDPOINT]);
 
 
-  useEffect(() => {
-    fetch(`${SERVER_API_ENDPOINT}/time`).then(res => res.json()).then(data => {
-      setCurrentTime(data.time);
-    });
-  }, []);
+  // useEffect(() => {
+  //   fetch(`${SERVER_API_ENDPOINT}/time`).then(res => res.json()).then(data => {
+  //     setCurrentTime(data.time);
+  //   });
+  // }, []);
 
   return (
     <>

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { auth, googleProvider } from '../firebase-config';
 import { signInWithPopup, signOut } from 'firebase/auth';
-import { BiSolidRightArrow } from 'react-icons/bi';
 
 export const Auth = () => {
     // const [name, setName] = useState(""); 
