@@ -37,6 +37,18 @@ export default {
         default: '#ebc08a',
         'dark': '#e8b57f',
       },
+      'garden': {
+        'lightshade': '#f9faf6',
+        'lightaccent': '#cad5b6',
+        'main': '#bdc88d',
+        'darkaccent': '#cd9397',
+        'darkshade': '#547369',
+        'evendarkershade': '#41514c',
+        'info': '#547168',
+        'success': '#6eb762',
+        'warning': '#eba62a',
+        'danger': '#f44336',
+      },
       zinc: colors.zinc,
       amber: colors.amber,
     }

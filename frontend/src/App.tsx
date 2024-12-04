@@ -42,8 +42,8 @@ function App() {
 
   return (
     <>
-      <h1 className='text-5xl m-10'>Pop-pup</h1>
-      <p>The browser extension for daily *adoptable* animal photos</p>
+      <h1 className='text-5xl m-10 text-center text-garden-lightshade font-serif'>Pop-pup</h1>
+      <p className='text-center text-garden-lightshade font-thin'>The browser extension for daily *adoptable* animal photos</p>
       <Bento recommendations={animal.name} />
     </>
   )
