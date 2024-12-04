@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { auth, googleProvider } from '../firebase-config';
 import { signInWithPopup, signOut } from 'firebase/auth';
+import { BiSolidRightArrow } from 'react-icons/bi';
 
 export const Auth = () => {
     // const [name, setName] = useState(""); 
@@ -56,7 +57,7 @@ export const Auth = () => {
         <div>
             {isLoggedIn ? (
                 <div>
-                    <h3>Welcome, {auth?.currentUser?.displayName}</h3>
+                    <h3>Welcome, {auth?.currentUser?.displayName?.split(' ')[0]}!</h3>
                     <button onClick={logout}>Logout</button>
                 </div>
             ) : (
