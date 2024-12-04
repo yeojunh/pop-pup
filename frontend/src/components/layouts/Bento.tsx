@@ -1,6 +1,6 @@
 import { motion, MotionProps } from 'framer-motion';
 import { twMerge } from 'tailwind-merge';
-import { Auth } from './auth';
+import { Auth } from '../../features/auth';
 
 export const Bento = ({recommendations}: {recommendations: string}) => {
   return (

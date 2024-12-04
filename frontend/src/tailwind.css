@@ -632,34 +632,14 @@ video {
   border-radius: 0.5rem;
 }
 
-.bg-amber-50 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 251 235 / var(--tw-bg-opacity, 1));
-}
-
 .bg-campfire-emerald-default {
   --tw-bg-opacity: 1;
   background-color: rgb(139 163 141 / var(--tw-bg-opacity, 1));
 }
 
-.bg-amber-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 243 199 / var(--tw-bg-opacity, 1));
-}
-
-.bg-campfire-yellow-light {
-  --tw-bg-opacity: 1;
-  background-color: rgb(243 228 176 / var(--tw-bg-opacity, 1));
-}
-
 .bg-campfire-lime-light {
   --tw-bg-opacity: 1;
   background-color: rgb(220 216 175 / var(--tw-bg-opacity, 1));
-}
-
-.bg-campfire-lime-default {
-  --tw-bg-opacity: 1;
-  background-color: rgb(189 196 153 / var(--tw-bg-opacity, 1));
 }
 
 .bg-gradient-to-tr {

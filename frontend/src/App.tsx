@@ -1,45 +1,13 @@
 import { useState, useEffect } from 'react';
 import './tailwind.css';
-import { Bento } from './components/Bento';
+import { Bento } from './components/layouts/Bento';
+import { Animal } from './types/api';
+import { initializeAnimal } from './types/initializers';
 
 function App() {
   const SERVER_API_ENDPOINT = import.meta.env.PROD ? import.meta.env.VITE_PROD_SERVER_ENDPOINT : import.meta.env.VITE_LOCAL_SERVER_ENDPOINT;
 
-  // const [count, setCount] = useState(0);
-  // const [currentTime, setCurrentTime] = useState("");
-  const [animal, setAnimal] = useState<Animal>(
-    {
-      id: "",
-      name: "",
-      description: "",
-      species: "",
-      age: 0,
-      weight: 0,
-      colour: [],
-      breed: [],
-      sex: "", 
-      location: "",
-      since: new Date(),
-      images: [],
-      compatibility: new Map(),
-    }
-  );
-
-  interface Animal {
-    id: string;
-    name: string;
-    description: string;
-    species: string;
-    age: number;
-    weight: number;
-    colour: string[];
-    breed: string[];
-    sex: string;
-    location: string;
-    since: Date;
-    images: string[];
-    compatibility: Map<string, string>;
-  }
+  const [animal, setAnimal] = useState<Animal>(initializeAnimal());
 
   useEffect(() => {
     const fetchAnimal = async () => {
@@ -50,7 +18,7 @@ function App() {
           id: data.id,
           name: data.name,
           description: data.description,
-          species: data.species,
+          pet_type: data.species,
           age: data.age,
           weight: data.weight,
           colour: data.colour,
@@ -59,7 +27,9 @@ function App() {
           location: data.location,
           since: new Date(data.since),
           images: data.image_url,
-          compatibility: new Map(Object.entries(data.compatibility)),
+          date_created: new Date(),
+          url: data.url,
+          compatibility: data.compatibility,
         };
         setAnimal(fetchedAnimal);
       } catch (err) {
@@ -69,13 +39,6 @@ function App() {
 
     fetchAnimal();
   }, [SERVER_API_ENDPOINT]);
-
-
-  // useEffect(() => {
-  //   fetch(`${SERVER_API_ENDPOINT}/time`).then(res => res.json()).then(data => {
-  //     setCurrentTime(data.time);
-  //   });
-  // }, []);
 
   return (
     <>
