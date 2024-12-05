@@ -23,28 +23,43 @@ def get_current_time():
 
 @app.route('/api/scraper/all')
 def get_all(): 
-    animals = scraper.fetch_all_animals()
-    return jsonify(animals)
+    if os.environ.get('IS_PROD') == 'False':
+        animals = scraper.fetch_all_animals()   
+        return jsonify(animals)
+    else: 
+        return {"message": "This endpoint is disabled in development mode."}
 
 @app.route('/api/scraper/dogs')
 def get_dogs(): 
-    dogs = scraper.fetch_dogs()
-    return jsonify(dogs)
+    if os.environ.get('IS_PROD') == 'False':
+        dogs = scraper.fetch_dogs()
+        return jsonify(dogs)
+    else:
+        return {"message": "This endpoint is disabled in development mode."}
 
 @app.route('/api/scraper/cats')
 def get_cats(): 
-    cats = scraper.fetch_cats()
-    return jsonify(cats)
+    if os.environ.get('IS_PROD') == 'False':
+        cats = scraper.fetch_cats()
+        return jsonify(cats)
+    else: 
+        return {"message": "This endpoint is disabled in development mode."}
 
 @app.route('/api/scraper/other')
 def get_other_animals(): 
-    other_animals = scraper.fetch_other_animals()
-    return jsonify(other_animals)
+    if os.environ.get('IS_PROD') == 'False':
+        other_animals = scraper.fetch_other_animals()
+        return jsonify(other_animals)
+    else: 
+        return {"message": "This endpoint is disabled in development mode."}
 
 @app.route('/api/scraper/post_default')
 def post_default_animal(): 
-    post = scraper.add_default_animal()
-    return jsonify(post)
+    if os.environ.get('IS_PROD') == 'False':
+        post = scraper.add_default_animal()
+        return jsonify(post)
+    else:
+        return {"message": "This endpoint is disabled in production mode."}
 
 @app.route('/api/scraper/get_default')
 def get_default_animal(): 
@@ -53,8 +68,11 @@ def get_default_animal():
 
 @app.route('/api/scraper/add_test_animal')
 def add_test_animal(): 
-    post = scraper.add_test_animal()
-    return jsonify(post)
+    if (os.environ.get('IS_PROD') == 'False'):
+        post = scraper.add_test_animal()
+        return jsonify(post)
+    else: 
+        return {"message": "This endpoint is disabled in production mode."}
 
 @app.route('/api/scraper/get_test_animal')
 def get_test_animal(): 
