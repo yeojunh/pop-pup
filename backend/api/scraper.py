@@ -40,22 +40,21 @@ class Scraper:
         }
 
 
-    # doesn't work on vercel, might have to run locally only
-    def fetch_all_animals(self): 
-        all_animals = {}
-        all_animals['dog'] = self.fetch_animal(self.urls['dog'], 'dog')
-        all_animals['cat'] = self.fetch_animal(self.urls['cat'], 'cat')
-        all_animals['amphibian_exotic'] = self.fetch_animal(self.urls['amphibian_exotic'], 'exotic amphibian')
-        all_animals['bird_exotic'] = self.fetch_animal(self.urls['bird_exotic'], 'exotic bird')
-        all_animals['farm_animal'] = self.fetch_animal(self.urls['farm_animal'], 'farm animal')
-        all_animals['farm_animal_exotic'] = self.fetch_animal(self.urls['farm_animal_exotic'], 'exotic farm animal')
-        all_animals['fish'] = self.fetch_animal(self.urls['fish'], 'fish')
-        all_animals['horse'] = self.fetch_animal(self.urls['horse'], 'horse')
-        all_animals['invertebrate'] = self.fetch_animal(self.urls['invertebrate'], 'invertebrate')
-        all_animals['rabbit'] = self.fetch_animal(self.urls['rabbit'], 'rabbit')
-        all_animals['reptile_exotic'] = self.fetch_animal(self.urls['reptile_exotic'], 'exotic reptile')
-        all_animals['small_animal'] = self.fetch_animal(self.urls['small_animal'], 'small animal')
-        all_animals['small_animal_exotic'] = self.fetch_animal(self.urls['small_animal_exotic'], 'small exotic animal')
+    def fetch_all_animals(self):
+        all_animals = []
+        all_animals.extend(self.fetch_animal(self.urls['dog'], 'dog'))
+        all_animals.extend(self.fetch_animal(self.urls['cat'], 'cat'))
+        all_animals.extend(self.fetch_animal(self.urls['amphibian_exotic'], 'exotic amphibian'))
+        all_animals.extend(self.fetch_animal(self.urls['bird_exotic'], 'exotic bird'))
+        all_animals.extend(self.fetch_animal(self.urls['farm_animal'], 'farm animal'))
+        all_animals.extend(self.fetch_animal(self.urls['farm_animal_exotic'], 'exotic farm animal'))
+        all_animals.extend(self.fetch_animal(self.urls['fish'], 'fish'))
+        all_animals.extend(self.fetch_animal(self.urls['horse'], 'horse'))
+        all_animals.extend(self.fetch_animal(self.urls['invertebrate'], 'invertebrate'))
+        all_animals.extend(self.fetch_animal(self.urls['rabbit'], 'rabbit'))
+        all_animals.extend(self.fetch_animal(self.urls['reptile_exotic'], 'exotic reptile'))
+        all_animals.extend(self.fetch_animal(self.urls['small_animal'], 'small animal'))
+        all_animals.extend(self.fetch_animal(self.urls['small_animal_exotic'], 'small exotic animal'))
         return all_animals
 
 
@@ -167,7 +166,6 @@ class Scraper:
             animal_url = card_html.find('a', href=True)['href']
             animal_html = requests.get(animal_url).text
             animal_info = self.get_animal_info_from_html(animal_html)
-            print(animal_url)
             animal_info['url'] = animal_url
             animals.append(animal_info)
         return animals
@@ -209,7 +207,6 @@ class Scraper:
         """Adds an animal to database."""
         doc_ref = self.db.collection('animals').document(animal_info['id'])
         doc_ref.set(animal_info)
-        pass
 
 
     def retrieve_animal_from_db(self, id: str) -> dict: 
@@ -363,7 +360,7 @@ class Scraper:
             'compatibility': [],
             'url': '',
             'images': [],
-            'date_created': firestore.SERVER_TIMESTAMP,
+            'date_created': datetime.datetime.now(tz=datetime.timezone.utc),
         }
 
 
