@@ -119,7 +119,7 @@ const RecommendationsBlock = ({
           <InnerBlock
             img="https://pbs.twimg.com/media/GJ2vmapXsAEFXdV.jpg"
             text="See more ->"
-            link={'recommendations'}
+            link={"recommendations"}
           />
         </div>
       </Block>
@@ -127,7 +127,15 @@ const RecommendationsBlock = ({
   );
 };
 
-const InnerBlock = ({ img, text, link }: { img: string; text?: string, link: string, }) => {
+const InnerBlock = ({
+  img,
+  text,
+  link,
+}: {
+  img: string;
+  text?: string;
+  link: string;
+}) => {
   return (
     <Block className="bg-garden-evendarkershade drop-shadow-md shadow-garden-evendarkershade text-garden-lightaccent font-bold">
       <Link to={link}>
@@ -156,7 +164,7 @@ const CatsBlock = () => {
         <h1 className="text-2xl font-medium mb-4">Cats</h1>
         <img src="https://i.pinimg.com/originals/bf/80/33/bf80330a6b4525324e166ae245e1b8a4.png" />
       </Link>
-      </Block>
+    </Block>
   );
 };
 

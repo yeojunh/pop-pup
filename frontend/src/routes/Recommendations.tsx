@@ -11,7 +11,11 @@ const Recomendations = () => {
         <h2>Cats</h2>
         <nav className="border-r p-4">
           {recommendations.map((recom) => (
-            <Link className="block my-4" to={`/recommendations/${recom.id}`} key={recom.id}>
+            <Link
+              className="block my-4"
+              to={`/recommendations/${recom.id}`}
+              key={recom.id}
+            >
               {recom.name}
             </Link>
           ))}
@@ -20,6 +24,6 @@ const Recomendations = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Recomendations;

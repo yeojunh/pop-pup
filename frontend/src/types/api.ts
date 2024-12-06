@@ -40,4 +40,4 @@ export type Recommendation = {
   weight: number;
   colour: string[];
   breed: string[];
-}
+};

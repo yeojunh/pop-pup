@@ -20,6 +20,6 @@ const Dogs = () => {
       <Outlet />
     </div>
   );
-}
+};
 
 export default Dogs;

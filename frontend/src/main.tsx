@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import "./tailwind.css";
 import App from "./App.tsx";
-import { BrowserRouter, Routes, Route, } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dogs from "./routes/Dogs.tsx";
 import Dog from "./routes/Dog.tsx";
 import Cats from "./routes/Cats.tsx";
@@ -32,5 +32,5 @@ createRoot(document.getElementById("root")!).render(
         />
       </Route>
     </Routes>
-  </BrowserRouter>
+  </BrowserRouter>,
 );

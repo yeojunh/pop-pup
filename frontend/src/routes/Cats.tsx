@@ -20,6 +20,6 @@ const Cats = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Cats;
