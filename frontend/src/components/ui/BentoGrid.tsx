@@ -1,11 +1,11 @@
 import { motion, MotionProps } from "framer-motion";
 import { twMerge } from "tailwind-merge";
-import { Auth } from "../../features/auth";
 import { useEffect, useState } from "react";
-import { Animal } from "../../types/api";
+import { Animal, Recommendation } from "../../types/api";
 import { initializeAnimal } from "../../types/initializers";
+import { Link } from "react-router-dom";
 
-export const Bento = () => {
+export const BentoGrid = () => {
   const SERVER_API_ENDPOINT = import.meta.env.PROD
     ? import.meta.env.VITE_PROD_SERVER_ENDPOINT
     : import.meta.env.VITE_LOCAL_SERVER_ENDPOINT;
@@ -53,7 +53,7 @@ export const Bento = () => {
         transition={{ staggerChildren: 0.1 }}
         className="mx-auto grid max-w-screen-2xl grid-cols-11 gap-4 p-2"
       >
-        <RecommendationsBlock recomendations={animal.name} />
+        <RecommendationsBlock recomendations={[animal]} />
         <DogsBlock />
         <CatsBlock />
         <AccountBlock />
@@ -99,7 +99,7 @@ const Block = ({ className, ...rest }: Props) => {
 const RecommendationsBlock = ({
   recomendations,
 }: {
-  recomendations: string;
+  recomendations: Recommendation[];
 }) => {
   return (
     <>
@@ -108,15 +108,18 @@ const RecommendationsBlock = ({
         <div className="flex flex-row mx-8 gap-4 justify-center">
           <InnerBlock
             img="https://miro.medium.com/v2/resize:fit:1400/1*rIkmavUeqyRySwlQdA9kKg.jpeg"
-            text={recomendations}
+            text={recomendations[0].name}
+            link={`recommendations/${recomendations[0].id}`}
           />
           <InnerBlock
             img="https://pbs.twimg.com/media/GJ2vmapXsAEFXdV.jpg"
             text="Toby"
+            link={`recommendations/${recomendations[1]?.id}`}
           />
           <InnerBlock
             img="https://pbs.twimg.com/media/GJ2vmapXsAEFXdV.jpg"
             text="See more ->"
+            link={'recommendations'}
           />
         </div>
       </Block>
@@ -124,11 +127,13 @@ const RecommendationsBlock = ({
   );
 };
 
-const InnerBlock = ({ img, text }: { img: string; text?: string }) => {
+const InnerBlock = ({ img, text, link }: { img: string; text?: string, link: string, }) => {
   return (
     <Block className="bg-garden-evendarkershade drop-shadow-md shadow-garden-evendarkershade text-garden-lightaccent font-bold">
-      <img className="w-40" src={img} />
-      <p>{text}</p>
+      <Link to={link}>
+        <img className="w-40" src={img} />
+        <p>{text}</p>
+      </Link>
     </Block>
   );
 };
@@ -136,8 +141,10 @@ const InnerBlock = ({ img, text }: { img: string; text?: string }) => {
 const DogsBlock = () => {
   return (
     <Block className="col-span-2 row-span-2">
-      <h1 className="text-2xl font-medium mb-4">Dogs</h1>
-      <img src="https://tr.rbxcdn.com/180DAY-78206173c998f8cbfa385b7a69a56712/420/420/Hat/Webp/noFilter" />
+      <Link to="dogs" className="block h-full w-full">
+        <h1 className="text-2xl font-medium mb-4">Dogs</h1>
+        <img src="https://tr.rbxcdn.com/180DAY-78206173c998f8cbfa385b7a69a56712/420/420/Hat/Webp/noFilter" />
+      </Link>
     </Block>
   );
 };
@@ -145,9 +152,11 @@ const DogsBlock = () => {
 const CatsBlock = () => {
   return (
     <Block className="col-span-2 row-span-2">
-      <h1 className="text-2xl font-medium mb-4">Cats</h1>
-      <img src="https://i.pinimg.com/originals/bf/80/33/bf80330a6b4525324e166ae245e1b8a4.png" />
-    </Block>
+      <Link to="cats" className="block h-full w-full">
+        <h1 className="text-2xl font-medium mb-4">Cats</h1>
+        <img src="https://i.pinimg.com/originals/bf/80/33/bf80330a6b4525324e166ae245e1b8a4.png" />
+      </Link>
+      </Block>
   );
 };
 
@@ -159,14 +168,17 @@ const OthersBlock = () => {
         <InnerBlock
           img="https://ih1.redbubble.net/image.4085943093.7745/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
           text="rabbits, birds & small animals"
+          link="small-animals"
         />
         <InnerBlock
           img="https://external-preview.redd.it/eTZ1DzYyLfPJFvko0tKd47Q6EedCQz7UFnROPDk9KpI.jpg?width=640&crop=smart&auto=webp&s=f56de1ffd5e5451ee64a0c1258e4d5e6f22e86fe"
           text="farm & stable animals"
+          link="farm-and-stable-animals"
         />
         <InnerBlock
           img="https://i.imgflip.com/3mha0a.jpg?a481416"
           text="reptiles, fish & invertebrates"
+          link="reptiles-fish-and-invertebrates"
         />
       </div>
     </Block>
@@ -185,7 +197,6 @@ const AccountBlock = () => {
   return (
     <Block className="col-span-2">
       <p className="text-2xl font-sm mb-4">Account</p>
-      <Auth />
     </Block>
   );
 };

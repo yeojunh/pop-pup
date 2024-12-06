@@ -19,14 +19,17 @@ createRoot(document.getElementById("root")!).render(
         <Route path="cats" element={<Cats />}>
           <Route path=":id" element={<Cat />} />
         </Route>
-        {/* <Route
+        {/* <Route path="recommendations" element={<Recommendations />}>
+          <Route path=":id" element={<Recommendation />} />
+        </Route> */}
+        <Route
           path="*"
           element={
             <main style={{ padding: "1rem" }}>
               <p>There's nothing here!</p>
             </main>
           }
-        /> */}
+        />
       </Route>
     </Routes>
   </BrowserRouter>
