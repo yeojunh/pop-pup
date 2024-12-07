@@ -2,17 +2,21 @@ import { Link, Outlet } from "react-router-dom";
 import { getCats } from "../utils/data";
 import Navbar from "../components/ui/Navbar";
 
-const Cats = () => {
-  const cats = getCats();
+const Recomendations = () => {
+  const recommendations = getCats();
   return (
     <div className="bg-garden-darkshade min-h-screen">
       <Navbar />
       <div className="flex">
         <h2>Cats</h2>
         <nav className="border-r p-4">
-          {cats.map((cat) => (
-            <Link className="block my-4" to={`/cats/${cat.id}`} key={cat.id}>
-              {cat.name}
+          {recommendations.map((recom) => (
+            <Link
+              className="block my-4"
+              to={`/recommendations/${recom.id}`}
+              key={recom.id}
+            >
+              {recom.name}
             </Link>
           ))}
         </nav>
@@ -22,4 +26,4 @@ const Cats = () => {
   );
 };
 
-export default Cats;
+export default Recomendations;

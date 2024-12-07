@@ -30,3 +30,14 @@ export type Animal = {
     staff_pick: string;
   };
 };
+
+export type Recommendation = {
+  id: string;
+  name: string;
+  description: string;
+  pet_type: string;
+  age: number;
+  weight: number;
+  colour: string[];
+  breed: string[];
+};

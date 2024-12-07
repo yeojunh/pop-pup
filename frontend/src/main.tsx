@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import "./tailwind.css";
 import App from "./App.tsx";
-import { BrowserRouter, Routes, Route, } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dogs from "./routes/Dogs.tsx";
 import Dog from "./routes/Dog.tsx";
 import Cats from "./routes/Cats.tsx";
@@ -19,15 +19,18 @@ createRoot(document.getElementById("root")!).render(
         <Route path="cats" element={<Cats />}>
           <Route path=":id" element={<Cat />} />
         </Route>
-        {/* <Route
+        {/* <Route path="recommendations" element={<Recommendations />}>
+          <Route path=":id" element={<Recommendation />} />
+        </Route> */}
+        <Route
           path="*"
           element={
             <main style={{ padding: "1rem" }}>
               <p>There's nothing here!</p>
             </main>
           }
-        /> */}
+        />
       </Route>
     </Routes>
-  </BrowserRouter>
+  </BrowserRouter>,
 );

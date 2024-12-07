@@ -1,12 +1,35 @@
 import { useState, useEffect } from "react";
-import { auth, googleProvider } from "../../firebase.config";
+import { auth, googleProvider } from "../../../firebase.config";
 import { signInWithPopup, signOut } from "firebase/auth";
+import { Link } from "react-router-dom";
 
-export const Auth = () => {
-  // const [name, setName] = useState("");
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
+const Navbar = () => {
+  return (
+    <div className="font-thin flex space-x-6 justify-end p-5">
+      <Home />
+      <About />
+      <LoginOut />
+    </div>
+  );
+};
 
+const Home = () => {
+  return (
+    <Link to="/">
+      <button>Home</button>
+    </Link>
+  );
+};
+
+const About = () => {
+  return (
+    <Link to="/about">
+      <button>About</button>
+    </Link>
+  );
+};
+
+const LoginOut = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -39,22 +62,20 @@ export const Auth = () => {
   return (
     <>
       {isLoggedIn ? (
-        <div className="text-garden-darkshade font-thin">
-          <h3 className="p-2">
-            Welcome, {auth?.currentUser?.displayName?.split(" ")[0]}!
-          </h3>
-          <button
-            className="bg-garden-darkshade text-garden-lightshade px-5 py-1 rounded-2xl"
-            onClick={logout}
-          >
-            Logout
-          </button>
+        <div>
+          <a onClick={logout}>
+            <button>Logout</button>
+          </a>
         </div>
       ) : (
-        <div className="text-garden-darkshade font-thin">
-          <button onClick={signInWithGoogle}>Sign in with Google </button>
+        <div>
+          <a onClick={signInWithGoogle}>
+            <button>Sign in with Google</button>
+          </a>
         </div>
       )}
     </>
   );
 };
+
+export default Navbar;
