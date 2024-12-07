@@ -78,6 +78,11 @@ def add_test_animal():
 def get_test_animal(): 
     post = scraper.get_test_animal()
     return jsonify(post)
+
+@app.route('/api/scraper/get_animal/<string:animal_id>')
+def get_animal(animal_id): 
+    post = scraper.get_animal(animal_id)
+    return jsonify(post)
     
 if __name__ == '__main__': 
     print("Server is starting...")

@@ -2,10 +2,8 @@ import { createRoot } from "react-dom/client";
 import "./tailwind.css";
 import App from "./App.tsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Dogs from "./routes/Dogs.tsx";
-import Dog from "./routes/Dog.tsx";
-import Cats from "./routes/Cats.tsx";
-import Cat from "./routes/Cat.tsx";
+import Pet from "./routes/Pet.tsx";
+import Pets from "./routes/Pets.tsx";
 import Home from "./routes/Home";
 
 createRoot(document.getElementById("root")!).render(
@@ -13,12 +11,9 @@ createRoot(document.getElementById("root")!).render(
     <Routes>
       <Route path="/" element={<App />}>
         <Route index element={<Home />} />
-        <Route path="dogs" element={<Dogs />}>
-          <Route path=":id" element={<Dog />} />
-        </Route>
-        <Route path="cats" element={<Cats />}>
-          <Route path=":id" element={<Cat />} />
-        </Route>
+        <Route path="dogs" element={<Pets petType="dog" />}/>
+        <Route path="cats" element={<Pets petType="cat" />}/>
+        <Route path="pets/:id" element={<Pet />}/>
         {/* <Route path="recommendations" element={<Recommendations />}>
           <Route path=":id" element={<Recommendation />} />
         </Route> */}

@@ -1,9 +1,10 @@
 import { motion, MotionProps } from "framer-motion";
 import { twMerge } from "tailwind-merge";
 import { useEffect, useState } from "react";
-import { Animal, Recommendation } from "../../types/api";
+import { Animal } from "../../types/api";
 import { initializeAnimal } from "../../types/initializers";
 import { Link } from "react-router-dom";
+import { fetchAnimal } from "../../utils/data";
 
 export const BentoGrid = () => {
   const SERVER_API_ENDPOINT = import.meta.env.PROD
@@ -13,36 +14,11 @@ export const BentoGrid = () => {
   const [animal, setAnimal] = useState<Animal>(initializeAnimal());
 
   useEffect(() => {
-    const fetchAnimal = async () => {
-      try {
-        const response = await fetch(
-          `${SERVER_API_ENDPOINT}/api/scraper/get_test_animal`,
-        );
-        const data = await response.json();
-        const fetchedAnimal: Animal = {
-          id: data.id,
-          name: data.name,
-          description: data.description,
-          pet_type: data.species,
-          age: data.age,
-          weight: data.weight,
-          colour: data.colour,
-          breed: data.breed,
-          sex: data.sex,
-          location: data.location,
-          since: new Date(data.since),
-          images: data.image_url,
-          date_created: new Date(),
-          url: data.url,
-          compatibility: data.compatibility,
-        };
-        setAnimal(fetchedAnimal);
-      } catch (err) {
-        console.error(err);
+    fetchAnimal('0001').then((animal) => {
+      if (animal) {
+        setAnimal(animal);
       }
-    };
-
-    fetchAnimal();
+    });
   }, [SERVER_API_ENDPOINT]);
 
   return (
@@ -99,7 +75,7 @@ const Block = ({ className, ...rest }: Props) => {
 const RecommendationsBlock = ({
   recomendations,
 }: {
-  recomendations: Recommendation[];
+  recomendations: Animal[];
 }) => {
   return (
     <>
