@@ -88,8 +88,13 @@ class Scraper:
         self.add_animal_to_db(animal_info)
 
 
-    def retrieve_default_animal_from_db(self) -> dict:  
+    def retrieve_default_animal_from_db(self) -> dict:
         animal = self.retrieve_animal_from_db('0000')
+        return animal
+
+    
+    def get_animal(self, id: str) -> dict: 
+        animal = self.retrieve_animal_from_db(id)
         return animal
 
 

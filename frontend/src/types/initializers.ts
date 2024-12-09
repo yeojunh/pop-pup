@@ -6,7 +6,7 @@ export function initializeAnimal(): Animal {
     name: "",
     description: "",
     pet_type: "",
-    age: 0,
+    age: "2 months old",
     weight: 0,
     colour: [],
     breed: [],
