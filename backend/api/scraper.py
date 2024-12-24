@@ -40,102 +40,64 @@ class Scraper:
         }
 
 
-    def fetch_all_animals(self):
-        all_animals = []
-        all_animals.extend(self.fetch_animal(self.urls['dog'], 'dog'))
-        all_animals.extend(self.fetch_animal(self.urls['cat'], 'cat'))
-        all_animals.extend(self.fetch_animal(self.urls['amphibian_exotic'], 'exotic amphibian'))
-        all_animals.extend(self.fetch_animal(self.urls['bird_exotic'], 'exotic bird'))
-        all_animals.extend(self.fetch_animal(self.urls['farm_animal'], 'farm animal'))
-        all_animals.extend(self.fetch_animal(self.urls['farm_animal_exotic'], 'exotic farm animal'))
-        all_animals.extend(self.fetch_animal(self.urls['fish'], 'fish'))
-        all_animals.extend(self.fetch_animal(self.urls['horse'], 'horse'))
-        all_animals.extend(self.fetch_animal(self.urls['invertebrate'], 'invertebrate'))
-        all_animals.extend(self.fetch_animal(self.urls['rabbit'], 'rabbit'))
-        all_animals.extend(self.fetch_animal(self.urls['reptile_exotic'], 'exotic reptile'))
-        all_animals.extend(self.fetch_animal(self.urls['small_animal'], 'small animal'))
-        all_animals.extend(self.fetch_animal(self.urls['small_animal_exotic'], 'small exotic animal'))
+    def refresh_all(self) -> dict: 
+        # docs = self.db.collection('animals')
+        docs = (
+            self.db.collection('animals')
+            .where('updated', '>', datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(hours=1))
+            .stream()
+        )
+        animals = self.fetch_all_animals()
+        for doc in docs: 
+            print(doc.id) 
+        return []
+    
+
+    def fetch_all_animals(self) -> dict:
+        all_animals = {}
+        all_animals |= self.parse_animals(self.urls['dog'])
+        # all_animals |= self.parse_animals(self.urls['cat'])
+        # all_animals |= self.parse_animals(self.urls['amphibian_exotic'])
+        # all_animals |= self.parse_animals(self.urls['bird_exotic'])
+        # all_animals |= self.parse_animals(self.urls['farm_animal'])
+        # all_animals |= self.parse_animals(self.urls['farm_animal_exotic'])
+        # all_animals |= self.parse_animals(self.urls['fish'])
+        # all_animals |= self.parse_animals(self.urls['horse'])
+        # all_animals |= self.parse_animals(self.urls['invertebrate'])
+        # all_animals |= self.parse_animals(self.urls['rabbit'])
+        # all_animals |= self.parse_animals(self.urls['reptile_exotic'])
+        # all_animals |= self.parse_animals(self.urls['small_animal'])
+        # all_animals |= self.parse_animals(self.urls['small_animal_exotic'])
         return all_animals
 
-
-    def fetch_dogs(self): 
-        return self.fetch_animal(self.urls['dog'], 'dog')
-
-
-    def fetch_cats(self): 
-        return self.fetch_animal(self.urls['cat'], 'cat')
-
-
-    def fetch_other_animals(self): 
-        animals = []
-        animals.extend(self.fetch_animal(self.urls['amphibian_exotic'], 'exotic amphibian'))
-        animals.extend(self.fetch_animal(self.urls['bird_exotic'], 'exotic bird'))
-        animals.extend(self.fetch_animal(self.urls['farm_animal'], 'farm animal'))
-        animals.extend(self.fetch_animal(self.urls['farm_animal_exotic'], 'exotic farm animal'))
-        animals.extend(self.fetch_animal(self.urls['fish'], 'fish'))
-        animals.extend(self.fetch_animal(self.urls['horse'], 'horse'))
-        animals.extend(self.fetch_animal(self.urls['invertebrate'], 'invertebrate'))
-        animals.extend(self.fetch_animal(self.urls['rabbit'], 'rabbit'))
-        animals.extend(self.fetch_animal(self.urls['reptile_exotic'], 'exotic reptile'))
-        animals.extend(self.fetch_animal(self.urls['small_animal'], 'small animal'))
-        animals.extend(self.fetch_animal(self.urls['small_animal_exotic'], 'small exotic animal'))
-        return animals
-
-
-    def add_default_animal(self): 
-        animal_info = self.initialize_info()
-        animal_info['compatibility'] = self.initialize_compatibility()
-        self.add_animal_to_db(animal_info)
-
-
-    def retrieve_default_animal_from_db(self) -> dict:
-        animal = self.retrieve_animal_from_db('0000')
+    
+    def get_test_animal(self) -> dict: 
+        animal = self.retrieve_animal_from_db('0001')
         return animal
 
-    
+
     def get_animal(self, id: str) -> dict: 
         animal = self.retrieve_animal_from_db(id)
         return animal
 
 
-    def add_test_animal(self):
-        animal = self.initialize_info()
-        animal['compatibility'] = self.initialize_compatibility()
-        animal['name'] = 'Ginger'
-        animal['description'] = 'Meet Ginger! He\'s a stinky dog who loves to play fetch.'
-        animal['since'] = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(10)
-        animal['age'] = 5
-        animal['pet_type'] = 'Dog'
-        animal['breed'] = ['Labrador Retriever', 'Beagle']
-        animal['colour'] = ['Yellow', 'White']
-        animal['weight'] = '50 lbs'
-        animal['sex'] = 'Male'
-        animal['location'] = 'Vancouver'
-        animal['id'] = '0001'
-        animal['url'] = ''
-        animal['images'] = []
-        animal['compatibility']['ok_with_dogs'] = 'Yes'
-        animal['compatibility']['ok_with_cats'] = 'No'
-        animal['compatibility']['ok_with_livestock'] = 'Unknown'
-        animal['compatibility']['house_trained'] = 'Yes'
-        animal['compatibility']['indoor_only'] = 'No'
-        animal['compatibility']['indoor_outdoor'] = 'Yes'
-        animal['compatibility']['lived_with_kids'] = 'No'
-        animal['compatibility']['special_needs'] = 'No'
-        animal['compatibility']['featured_pet'] = 'Yes'
-        animal['compatibility']['staff_pick'] = 'No'
-        animal['compatibility']['bonded'] = 'Yes'
-        animal['compatibility']['in_foster'] = 'Yes'
-        animal['compatibility']['adoption_pending'] = 'Yes'
-        animal['compatibility']['longterm_resident'] = 'No'
-        self.add_animal_to_db(animal)
+    def add_animal_to_db(self, animal_info: dict) -> None: 
+        """Adds an animal to database."""
+        doc_ref = self.db.collection('animals').document(animal_info['id'])
+        doc_ref.set(animal_info)
 
-    def get_test_animal(self): 
-        animal = self.retrieve_animal_from_db('0001')
-        return animal
 
-    def fetch_animal(self, url: str, animal: str) -> list: 
-        """Given the URL of the animal listings page, returns a list of animal listings."""
+    def retrieve_animal_from_db(self, id: str) -> dict|None: 
+        """Retrieves an animal from the database."""
+        animal = self.db.collection('animals').document(id).get()
+        if animal.exists: 
+            return animal.to_dict()
+        else:
+            return None
+
+
+    def parse_animals(self, url: str) -> dict: 
+        """Given the URL of the animal listings page, returns a dictionary of animal listings in format {id: info}."""
         options = webdriver.ChromeOptions()
         options.add_argument("--headless=new")
         driver = webdriver.Chrome(options=options)
@@ -152,19 +114,19 @@ class Scraper:
                 html = driver.page_source
                 input_element.click()
         except (TimeoutException, ElementNotInteractableException) as e: 
-            print(f"Loaded all {animal}s.")
+            print(f"Loaded {url}.")
         except Exception as e: 
-            print(f"Error loading {animal}s: {e}")
+            print(f"Error loading {url}: {e}")
         finally: 
             driver.quit()
         
-        animals_list = self.get_animals_from_html(html)
-        return animals_list 
+        animals = self.get_animals_from_html(html)
+        return animals 
 
 
-    def get_animals_from_html(self, html: str) -> list: 
-        """Given the string of dog listings page, returns a list of animal listings.""" 
-        animals = []
+    def get_animals_from_html(self, html: str) -> dict: 
+        """Given the string of animal listings page, returns a dictionary of animal listings in format {id: info}.""" 
+        animals = {}
         soup = BeautifulSoup(html, 'html.parser')
         cards_html = soup.find_all(class_='ybd-sb-pet-card-container')
         for card_html in cards_html: 
@@ -172,7 +134,8 @@ class Scraper:
             animal_html = requests.get(animal_url).text
             animal_info = self.get_animal_info_from_html(animal_html)
             animal_info['url'] = animal_url
-            animals.append(animal_info)
+            print(animal_url)
+            animals[animal_info['id']] = animal_info
         return animals
 
 
@@ -204,20 +167,15 @@ class Scraper:
         self.parse_animal_compatibility(compatibility_htmls, compatibility)
         info['compatibility'] = compatibility
 
-        self.add_animal_to_db(info)
+        # check if animal already exists in database
+        retrieved = self.retrieve_animal_from_db(info['id'])
+        if retrieved is None:
+            self.add_animal_to_db(info)
+        else:
+            info['date_created'] = retrieved['date_created']
+            self.add_animal_to_db(info)
+
         return info
-
-
-    def add_animal_to_db(self, animal_info: dict): 
-        """Adds an animal to database."""
-        doc_ref = self.db.collection('animals').document(animal_info['id'])
-        doc_ref.set(animal_info)
-
-
-    def retrieve_animal_from_db(self, id: str) -> dict: 
-        """Retrieves an animal from the database."""
-        animal = self.db.collection('animals').document(id).get().to_dict()
-        return animal
 
 
     def get_animal_images_from_html(self, images_html: str) -> list: 
@@ -365,6 +323,7 @@ class Scraper:
             'compatibility': [],
             'url': '',
             'images': [],
+            'updated': datetime.datetime.now(tz=datetime.timezone.utc),
             'date_created': datetime.datetime.now(tz=datetime.timezone.utc),
         }
 
